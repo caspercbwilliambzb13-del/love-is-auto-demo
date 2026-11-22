@@ -331,6 +331,8 @@
       .own-edit input, .own-edit textarea{width:100%; background:var(--bg); border:1px solid var(--border); border-radius:10px; color:var(--text); font-size:15px; padding:9px 11px; font-family:inherit; min-height:44px; margin-top:4px;}
       .own-edit .wide{grid-column:1 / -1;}
       .own-save{width:100%; background:#fff; color:#0A0A0A; border:0; border-radius:999px; padding:12px; font-weight:700; font-size:15px; min-height:48px; margin-top:10px;}
+      .own-delete{width:100%; background:transparent; color:#FF6B6B; border:1px solid #FF6B6B; border-radius:999px; padding:12px; font-weight:700; font-size:15px; min-height:48px; margin-top:10px;}
+      .own-delete.armed{background:#FF6B6B; color:#fff;}
       .field input.err, input.err{border-color:#E5484D !important;}
       .field .err-msg{color:#FF9A9E; font-size:13px; font-weight:600; margin-top:4px; display:none;}
       /* ---------- Toast + PIN shake ---------- */
@@ -1200,7 +1202,8 @@
               '<button type="button" class="btn-to-book" data-act="done">Выполнена</button>' +
               '<button type="button" class="btn-to-book" data-act="cancelled">Отменить</button>' +
             '</div>' +
-            '<button type="button" class="own-save">Сохранить изменения</button>';
+            '<button type="button" class="own-save">Сохранить изменения</button>' +
+            '<button type="button" class="own-delete">Удалить заявку</button>';
           if (b.comment) det.querySelector(".cmt").textContent = b.comment;
           if (b.note) det.querySelector(".nt").textContent = b.note;
           det.querySelector(".ed-date").value = b.date || "";
@@ -1225,6 +1228,18 @@
             state.bookings[idx].total = totVal;
             state.bookings[idx].note = det.querySelector(".ed-note").value.trim();
             saveBookings(); renderOwner(); toast("Сохранено ✓");
+          });
+          det.querySelector(".own-delete").addEventListener("click", function(ev){
+            ev.stopPropagation();
+            var delBtn = det.querySelector(".own-delete");
+            if (!delBtn.classList.contains("armed")){
+              delBtn.classList.add("armed");
+              delBtn.textContent = "Точно удалить?";
+              setTimeout(function(){ delBtn.classList.remove("armed"); delBtn.textContent = "Удалить заявку"; }, 3000);
+              return;
+            }
+            state.bookings.splice(idx, 1);
+            saveBookings(); renderOwner(); updateBadge(); toast("Заявка удалена");
           });
           card.appendChild(det);
           card.addEventListener("click", function(){ card.classList.toggle("open"); });
@@ -1867,7 +1882,7 @@
             }
             voiceText.textContent = (finalTranscript + " " + interim).trim() || "Слушаю…";
           };
-          recog.onerror = function(){ stopVoice(false); };
+          recog.onerror = function(){ stopVoice(false); botSay("Голосовой ввод недоступен, напишите текстом"); };
           recog.onend = function(){ if (recording) { try { recog.start(); } catch(e){} } };
           recog.start();
           recording = true;
