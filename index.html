@@ -107,7 +107,7 @@
         display:flex; align-items:center; justify-content:center; pointer-events:none;
         box-shadow:0 4px 16px rgba(0,0,0,.55);
       }
-      .ba-range{position:absolute; inset:0; width:100%; height:100%; opacity:0; z-index:5; margin:0; cursor:ew-resize; min-height:100%; touch-action:pan-y;}
+      .ba-range{position:absolute; inset:0; width:100%; height:100%; opacity:0; z-index:5; margin:0; cursor:ew-resize; min-height:100%; touch-action:pan-y; pointer-events:none;}
       .work-item{margin-bottom:22px;}
       .work-item .cap{margin:10px 2px 0; font-size:15px; font-weight:600;}
       .work-item .cap span{display:block; color:var(--muted); font-weight:400; font-size:13.5px; margin-top:2px;}
@@ -1030,7 +1030,21 @@
           function apply(){ ba.style.setProperty("--pos", range.value + "%"); }
           range.addEventListener("input", apply); apply();
           range.addEventListener("input", function(){ ba.classList.add("touched"); });
-          ba.addEventListener("pointerdown", function(){ ba.classList.add("touched"); }, {passive:true});
+          /* Шторка — pointer-события на самой карточке: работает одинаково
+             на iOS, Android и десктопе, не зависит от нативного drag
+             невидимого range-инпута (на iPhone он не всегда срабатывает). */
+          ba.addEventListener("pointerdown", function(e){
+            ba.classList.add("touched");
+            var r = ba.getBoundingClientRect();
+            function setFromX(x){ var p = Math.max(0, Math.min(100, (x - r.left) / r.width * 100)); range.value = p.toFixed(1); apply(); }
+            setFromX(e.clientX);
+            try { ba.setPointerCapture(e.pointerId); } catch(err){}
+            function mv(ev){ setFromX(ev.clientX); }
+            function up(){ ba.removeEventListener("pointermove", mv); ba.removeEventListener("pointerup", up); ba.removeEventListener("pointercancel", up); }
+            ba.addEventListener("pointermove", mv);
+            ba.addEventListener("pointerup", up);
+            ba.addEventListener("pointercancel", up);
+          }, {passive:true});
           item.querySelector(".zoom-btn").addEventListener("click", function(){ openLightbox(w.after, w.title, w.desc, w); });
           wrap.appendChild(item);
         });
