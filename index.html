@@ -90,7 +90,7 @@
       /* ---------- Works / BA slider ---------- */
       .ba{
         position:relative; border-radius:16px; overflow:hidden; border:1px solid var(--border);
-        aspect-ratio:4/3; background:#111; --pos:50%; touch-action:none; user-select:none;
+        aspect-ratio:4/3; background:#111; --pos:50%; touch-action:pan-y; user-select:none;
       }
       .ba img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; pointer-events:none;}
       .ba .img-before{clip-path: inset(0 calc(100% - var(--pos)) 0 0);}
@@ -107,7 +107,7 @@
         display:flex; align-items:center; justify-content:center; pointer-events:none;
         box-shadow:0 4px 16px rgba(0,0,0,.55);
       }
-      .ba-range{position:absolute; inset:0; width:100%; height:100%; opacity:0; z-index:5; margin:0; cursor:ew-resize; min-height:100%;}
+      .ba-range{position:absolute; inset:0; width:100%; height:100%; opacity:0; z-index:5; margin:0; cursor:ew-resize; min-height:100%; touch-action:pan-y;}
       .work-item{margin-bottom:22px;}
       .work-item .cap{margin:10px 2px 0; font-size:15px; font-weight:600;}
       .work-item .cap span{display:block; color:var(--muted); font-weight:400; font-size:13.5px; margin-top:2px;}
